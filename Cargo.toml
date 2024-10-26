@@ -1,0 +1,18 @@
+[package]
+name = "tsumugi"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.89"
+clap = { version = "4.5.17", features = ["derive"] }
+curl = { version = "0.4.46", default-features = false, features = ["rustls"] }
+libc = "0.2.158"
+prost = "0.13.2"
+prost-types = "0.13.2"
+which = "6.0.3"
+
+[build-dependencies]
+bindgen = "0.70.1"
+clap = { version = "4.5.17", features = ["derive"] }
+prost-build = "0.13.2"

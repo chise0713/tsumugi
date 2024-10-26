@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags: [ "**" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  Build:
+    uses: ./.github/workflows/build.yml
+  Release:
+    needs: Build
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create completions 
+        run: |
+          cargo install rust-script
+          tar -cvf completions.tar -C `./.github/scripts/generate_completions.rs` .
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Rename artifact
+        run: |
+          mv artifacts/tsumugi-x86_64-unknown-linux-gnu/tsumugi tsumugi-x86_64-unknown-linux-gnu
+          mv artifacts/tsumugi-x86_64-unknown-linux-musl/tsumugi tsumugi-x86_64-unknown-linux-musl
+          mv artifacts/tsumugi-aarch64-unknown-linux-gnu/tsumugi tsumugi-aarch64-unknown-linux-gnu
+          mv artifacts/tsumugi-aarch64-unknown-linux-musl/tsumugi tsumugi-aarch64-unknown-linux-musl
+          mv artifacts/tsumugi-armv7-unknown-linux-gnueabihf/tsumugi tsumugi-armv7-unknown-linux-gnueabihf
+          mv artifacts/tsumugi-armv7-unknown-linux-musleabihf/tsumugi tsumugi-armv7-unknown-linux-musleabihf
+          mv artifacts/tsumugi-x86_64-pc-windows-msvc/tsumugi.exe tsumugi-x86_64-pc-windows-msvc.exe
+          mv artifacts/tsumugi-universal-apple-darwin/tsumugi tsumugi-universal-apple-darwin
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          generate_release_notes: true
+          files: |
+            tsumugi-x86_64-unknown-linux-gnu
+            tsumugi-x86_64-unknown-linux-musl
+            tsumugi-aarch64-unknown-linux-gnu
+            tsumugi-aarch64-unknown-linux-musl
+            tsumugi-armv7-unknown-linux-gnueabihf
+            tsumugi-armv7-unknown-linux-musleabihf
+            tsumugi-x86_64-pc-windows-msvc.exe
+            tsumugi-universal-apple-darwin
+            completions.tar
