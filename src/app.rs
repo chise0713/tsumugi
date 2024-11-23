@@ -15,11 +15,11 @@ pub struct App {
 
     /// Country code
     #[arg(short, long, global = true)]
-    pub code: Option<String>,
+    pub code: Option<Box<str>>,
 
     /// Output path
     #[arg(short, long, global = true)]
-    pub output: Option<String>,
+    pub output: Option<Box<str>>,
 }
 
 #[derive(Debug, Args)]
@@ -27,11 +27,11 @@ pub struct App {
 pub struct SourceGroup {
     /// Url of the file to download
     #[arg(short, long, global = true)]
-    pub file: Option<String>,
+    pub file: Option<Box<str>>,
 
     /// Path of the file to read
     #[arg(short, long, global = true)]
-    pub url: Option<String>,
+    pub url: Option<Box<str>>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -49,7 +49,7 @@ pub enum Commands {
 
         /// Output path
         #[arg(short, long, required = true)]
-        output: String,
+        output: Box<str>,
     },
 
     #[command(about = "Generate a systemd service unit")]
@@ -65,15 +65,15 @@ pub enum GenerateCommands {
     Nftables {
         /// Table name
         #[arg(short, long)]
-        table: String,
+        table: Box<str>,
 
         /// IPv4 set name
         #[arg(short = '4', long)]
-        ipv4set: String,
+        ipv4set: Box<str>,
 
         /// IPv6 set name
         #[arg(short = '6', long)]
-        ipv6set: String,
+        ipv6set: Box<str>,
     },
 
     #[command(about = "Generate a iproute2 script")]
@@ -93,7 +93,7 @@ pub enum Iproute2Commands {
 
         /// Table name
         #[arg(short, long, default_value = "main")]
-        table: String,
+        table: Box<str>,
     },
     #[command(about = "Generate a iproute2 route table script")]
     Route {
@@ -103,19 +103,19 @@ pub enum Iproute2Commands {
 
         /// Table name
         #[arg(short, long, default_value = "main")]
-        table: String,
+        table: Box<str>,
 
         /// IPv4 Gateway address
         #[arg(short = '4', long)]
-        ipv4_gateway: String,
+        ipv4_gateway: Box<str>,
 
         /// IPv6 Gateway address
         #[arg(short = '6', long)]
-        ipv6_gateway: String,
+        ipv6_gateway: Box<str>,
 
         /// Route device
         #[arg(short, long)]
-        dev: String,
+        dev: Box<str>,
     },
 }
 

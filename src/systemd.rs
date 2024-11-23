@@ -7,7 +7,7 @@ pub fn generate_nftables(
     table: &str,
     ipv4set: &str,
     ipv6set: &str,
-) -> Result<String> {
+) -> Result<Box<str>> {
     let nftables_exe = which("nft")?.to_string_lossy().into_owned();
     let current_exe = std::env::current_exe()?.to_string_lossy().into_owned();
     let code_args = if !code.is_empty() {
@@ -44,7 +44,8 @@ ExecStop={nftables_exe} flush set inet {table} {ipv6set}
 [Install]
 WantedBy=multi-user.target
 "
-    ))
+    )
+    .into_boxed_str())
 }
 
 pub fn generate_iproute2_route(
@@ -54,7 +55,7 @@ pub fn generate_iproute2_route(
     ipv4_gateway: &str,
     ipv6_gateway: &str,
     dev: &str,
-) -> Result<String> {
+) -> Result<Box<str>> {
     let ip_exe = which("ip")?.to_string_lossy().into_owned();
     let current_exe = std::env::current_exe()?.to_string_lossy().into_owned();
     let code_args = if !code.is_empty() {
@@ -103,10 +104,11 @@ ExecStop=/bin/rm -f {cache_path}
 [Install]
 WantedBy=multi-user.target
 "
-    ))
+    )
+    .into_boxed_str())
 }
 
-pub fn generate_iproute2_rule(url: &str, code: &str, table: &str) -> Result<String> {
+pub fn generate_iproute2_rule(url: &str, code: &str, table: &str) -> Result<Box<str>> {
     let ip_exe = which("ip")?.to_string_lossy().into_owned();
     let current_exe = std::env::current_exe()?.to_string_lossy().into_owned();
     let code_args = if !code.is_empty() {
@@ -116,7 +118,7 @@ pub fn generate_iproute2_rule(url: &str, code: &str, table: &str) -> Result<Stri
     };
     let cache_path = "/tmp/.tsumugi_iproute2_rule_cache.db";
     let orig_path = format!("{}.bak", cache_path);
-    let generate_args = "generate iproute2 route";
+    let generate_args = "generate iproute2 rule";
     let table = format!("--table {}", table);
     Ok(format!(
         "\
@@ -151,5 +153,6 @@ ExecStop=/bin/rm -f /tmp/.tsumugi_iproute2_rule_cache.db
 [Install]
 WantedBy=multi-user.target
 "
-    ))
+    )
+    .into_boxed_str())
 }

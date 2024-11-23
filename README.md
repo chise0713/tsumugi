@@ -16,19 +16,19 @@ RemainAfterExit=yes
 
 ExecStartPre=/usr/bin/tsumugi --url https://github.com/SagerNet/sing-geoip/raw/refs/heads/rule-set/geoip-cn.srs \
             convert --output /tmp/.tsumugi_iproute2_rule_cache.db srs
-ExecStart=/bin/sh -ec "/usr/bin/tsumugi -f /tmp/.tsumugi_iproute2_rule_cache.db generate iproute2 route \
+ExecStart=/bin/sh -ec "/usr/bin/tsumugi -f /tmp/.tsumugi_iproute2_rule_cache.db generate iproute2 rule \
             --table main | /usr/bin/ip -batch -"
 
 ExecReload=/bin/sh -ec "/bin/mv /tmp/.tsumugi_iproute2_rule_cache.db /tmp/.tsumugi_iproute2_rule_cache.db.bak; \
             /usr/bin/tsumugi --url https://github.com/SagerNet/sing-geoip/raw/refs/heads/rule-set/geoip-cn.srs \
             convert --output /tmp/.tsumugi_iproute2_rule_cache.db srs; \
-            /usr/bin/tsumugi -f /tmp/.tsumugi_iproute2_rule_cache.db.bak generate iproute2 route \
+            /usr/bin/tsumugi -f /tmp/.tsumugi_iproute2_rule_cache.db.bak generate iproute2 rule \
             --delete --table main | /usr/bin/ip -batch -; \
             /bin/rm /tmp/.tsumugi_iproute2_rule_cache.db.bak; \
-            /usr/bin/tsumugi -f /tmp/.tsumugi_iproute2_rule_cache.db generate iproute2 route \
+            /usr/bin/tsumugi -f /tmp/.tsumugi_iproute2_rule_cache.db generate iproute2 rule \
             --table main | /usr/bin/ip -batch -"
 
-ExecStop=/bin/sh -ec "/usr/bin/tsumugi -f /tmp/.tsumugi_iproute2_rule_cache.db generate iproute2 route \
+ExecStop=/bin/sh -ec "/usr/bin/tsumugi -f /tmp/.tsumugi_iproute2_rule_cache.db generate iproute2 rule \
             --delete --table main | /usr/bin/ip -batch -"
 ExecStop=/bin/rm -f /tmp/.tsumugi_iproute2_rule_cache.db
 

@@ -38,7 +38,7 @@ pub fn nftables(
     table: &str,
     ipv4set: &str,
     ipv6set: &str,
-) -> Result<String> {
+) -> Result<Box<str>> {
     let (ipv4_cidrs, ipv6_cidrs) = cidr_pair;
     let mut script = String::new();
 
@@ -61,14 +61,14 @@ pub fn nftables(
             writeln!(script, "add element inet {} {} {{ }}", table, set)?;
         }
     }
-    Ok(script)
+    Ok(script.into_boxed_str())
 }
 
 pub fn iproute2rule(
     cidr_pair: (Vec<Cidr>, Vec<Cidr>),
     delete: bool,
     table: &str,
-) -> Result<String> {
+) -> Result<Box<str>> {
     let (ipv4_cidrs, ipv6_cidrs) = cidr_pair;
     let mut script = String::new();
     let action = if delete { "delete" } else { "add" };
@@ -90,7 +90,7 @@ pub fn iproute2rule(
             table
         )?;
     }
-    Ok(script)
+    Ok(script.into_boxed_str())
 }
 
 pub fn iproute2route(
@@ -100,7 +100,7 @@ pub fn iproute2route(
     ipv4_gateway: &str,
     ipv6_gateway: &str,
     dev: &str,
-) -> Result<String> {
+) -> Result<Box<str>> {
     let (ipv4_cidrs, ipv6_cidrs) = cidr_pair;
     let mut script = String::new();
     let action = if delete { "delete" } else { "add" };
@@ -126,5 +126,5 @@ pub fn iproute2route(
             dev
         )?;
     }
-    Ok(script)
+    Ok(script.into_boxed_str())
 }

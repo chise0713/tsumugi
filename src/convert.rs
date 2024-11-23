@@ -2,7 +2,7 @@ use crate::{geoip::*, srs};
 use anyhow::{bail, Ok, Result};
 use prost::Message as _;
 
-pub fn to_srs(cidr_pair: (Vec<Cidr>, Vec<Cidr>)) -> Result<Vec<u8>> {
+pub fn to_srs(cidr_pair: (Vec<Cidr>, Vec<Cidr>)) -> Result<Box<[u8]>> {
     use srs::{CIDRList, IPv4CIDR, IPv6CIDR};
     let (ipv4_cidrs, ipv6_cidrs) = cidr_pair;
     let mut ipv4_vec: Vec<IPv4CIDR> = Vec::new();
@@ -38,10 +38,13 @@ pub fn to_srs(cidr_pair: (Vec<Cidr>, Vec<Cidr>)) -> Result<Vec<u8>> {
     if data_ptr.is_null() {
         bail!("data_ptr.is_null()")
     }
-    Ok(unsafe { Vec::from_raw_parts(data_ptr, length as usize, length as usize) })
+    Ok(
+        unsafe { Vec::from_raw_parts(data_ptr, length as usize, length as usize) }
+            .into_boxed_slice(),
+    )
 }
 
-pub fn to_ray(cidr_pair: (Vec<Cidr>, Vec<Cidr>), country_code: &str) -> Result<Vec<u8>> {
+pub fn to_ray(cidr_pair: (Vec<Cidr>, Vec<Cidr>), country_code: &str) -> Result<Box<[u8]>> {
     if country_code == "NULL" {
         bail!("country_code == \"NULL\"");
     }
@@ -55,5 +58,5 @@ pub fn to_ray(cidr_pair: (Vec<Cidr>, Vec<Cidr>), country_code: &str) -> Result<V
     };
     geoip_list.entry.push(geoip_entry);
     geoip_list.encode(&mut buffer)?;
-    Ok(buffer)
+    Ok(buffer.into_boxed_slice())
 }

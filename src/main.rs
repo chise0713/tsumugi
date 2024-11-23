@@ -27,15 +27,15 @@ fn main() -> Result<()> {
         args.output.unwrap_or_default(),
     );
     let (mut nftables, mut nf_table, mut nf_ipv4set, mut nf_ipv6set) =
-        (false, String::new(), String::new(), String::new());
+        (false, Box::from(""), Box::from(""), Box::from(""));
     let (mut iproute2_rule, mut iproute2_route) = (false, false);
     let (mut delete, mut ru_table, mut r_table, mut r_ipv4_gateway, mut r_ipv6_gateway, mut r_dev) = (
         false,
-        String::new(),
-        String::new(),
-        String::new(),
-        String::new(),
-        String::new(),
+        Box::from(""),
+        Box::from(""),
+        Box::from(""),
+        Box::from(""),
+        Box::from(""),
     );
     let mut systemd = false;
     let (mut to_srs, mut to_ray) = (false, false);
@@ -132,9 +132,9 @@ fn main() -> Result<()> {
             unreachable!()
         }
     }
-    let print = if output.is_empty() { true } else { false };
-    let s: String;
-    let buffer: Vec<u8>;
+    let print = output.is_empty();
+    let s: Box<str>;
+    let buffer: Box<[u8]>;
 
     if systemd {
         if url.is_empty() {
@@ -162,15 +162,15 @@ fn main() -> Result<()> {
             unreachable!()
         };
         buffer = if !print {
-            s.as_bytes().to_owned()
+            s.as_bytes().into()
         } else {
-            vec![]
+            vec![].into()
         }
     } else {
         let cidr_pair = if !url.is_empty() {
             read::fetch(&code, &url)?
         } else if let Some(file) = &args.source_group.file {
-            read::from_file(&code, file.into())?
+            read::from_file(&code, file.parse()?)?
         } else {
             unreachable!()
         };
@@ -191,12 +191,12 @@ fn main() -> Result<()> {
                 )?
             };
             buffer = if !print {
-                s.as_bytes().to_owned()
+                s.as_bytes().into()
             } else {
-                vec![]
+                vec![].into()
             }
         } else {
-            s = "".to_owned();
+            s = Box::from("");
             buffer = if to_srs {
                 convert::to_srs(cidr_pair)?
             } else if to_ray {
@@ -210,7 +210,7 @@ fn main() -> Result<()> {
     if print {
         print!("{}", s);
     } else {
-        File::create(output)?.write_all(&buffer)?;
+        File::create(&*output)?.write_all(&buffer)?;
     }
 
     Ok(())

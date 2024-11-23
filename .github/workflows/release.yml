@@ -17,6 +17,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ~/.cache/rust-script/
+          key: cargo-release-${{ hashFiles('./.github/scripts/generate_completions.rs') }}
       - name: Create completions 
         run: |
           cargo install rust-script
